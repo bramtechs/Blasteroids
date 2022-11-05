@@ -10,6 +10,20 @@ FPS = 60
 PL_ANGLE = 30
 
 
+def asteroid_draw(screen, rect, samples):
+    half_width = rect[2] / 2
+    half_height = rect[3] / 2
+
+    next_angle = 0
+    for i in range(samples):
+        x = half_width * math.cos(math.radians(next_angle))
+        y = half_height * math.sin(math.radians(next_angle))
+
+        pygame.draw.circle(screen, (0, 255, 255), (rect[0] + x, rect[1] + y), 3)
+
+        next_angle += 360 / samples
+
+
 def draw_cone(screen, pos, radius, rot):
     x = math.cos(math.radians(rot + 180 + PL_ANGLE)) * radius + pos[0]
     y = math.sin(math.radians(rot + 180 + PL_ANGLE)) * radius + pos[1]
@@ -79,6 +93,7 @@ def start():
 
         screen.fill(BG)
         player_draw(screen, player)
+        asteroid_draw(screen, (150, 50, 300, 50), 30)
         pygame.display.flip()
 
         player["rot"] += delta * 20
