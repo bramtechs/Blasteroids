@@ -14,38 +14,132 @@ PL_ANGLE = 30
 world = []
 
 
-class Player:
-    def __init__(self, pos, size):
-        self.pos = pos
-        self.size = size
+class Polygon:
+    def __init__(self):
+        global world
+        world.append(self)
+        self.vertices = []
 
     def update(self, delta):
+        self.vertices = self.gen_vertices()
+
+    def draw(self, screen):
         pass
+
+    def gen_vertices(self) -> []:
+        pass
+
+    # https://www.youtube.com/watch?v=7Ik2vowGcU0
+    def overlaps(self, other) -> bool:
+        assert (self is not other)
+        poly1 = self
+        poly2 = other
+
+        for shape in range(2):
+            if shape == 1:
+                poly1 = other
+                poly2 = self
+
+            for a in range(len(poly1.vertices)):
+                b = (a + 1) % len(poly1.vertices)
+
+                # get the normal of the edge
+                axis_proj = (
+                    -(poly1.vertices[b][1] - poly1.vertices[a][1]),
+                    poly1.vertices[b][0] - poly1.vertices[a][0]
+                )
+
+                # work out min and max 1D points for self
+                min_r1 = sys.float_info.max
+                max_r1 = sys.float_info.min
+
+                for p in range(len(poly1.vertices)):
+                    q = poly1.vertices[p][0] * axis_proj[0] + poly1.vertices[p][1] * axis_proj[1]
+                    min_r1 = min(min_r1, q)
+                    max_r1 = max(max_r1, q)
+
+                # work out min and max 1D points for other
+                min_r2 = sys.float_info.max
+                max_r2 = sys.float_info.min
+
+                for p in range(len(poly2.vertices)):
+                    q = poly2.vertices[p][0] * axis_proj[0] + poly2.vertices[p][1] * axis_proj[1]
+                    min_r2 = min(min_r2, q)
+                    max_r2 = max(max_r2, q)
+
+                # check if extents of shadows overlap
+                if not (max_r2 >= min_r1 and max_r1 >= min_r2):
+                    return False
+        return True
+
+
+class Player(Polygon):
+    def __init__(self, pos, size):
+        super().__init__()
+        self.pos = pos
+        self.size = size
+        self.rot = 0
+        self.vertices = self.gen_vertices()
+
+    def gen_vertices(self) -> []:
+        vertices = []
+        # 0 top left
+        x = math.cos(math.radians(self.rot + 180 + PL_ANGLE)) * self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 + PL_ANGLE)) * self.size + self.pos[1]
+        vertices.append((x, y))
+
+        # 1 bot left
+        x = math.cos(math.radians(self.rot + 180 - PL_ANGLE)) * self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 - PL_ANGLE)) * self.size + self.pos[1]
+        vertices.append((x, y))
+
+        # 2 top left inner
+        x = math.cos(math.radians(self.rot + 180 + PL_ANGLE / 2)) * self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 + PL_ANGLE / 2)) * self.size + self.pos[1]
+        vertices.append((x, y))
+
+        # 3 bot left inner
+        x = math.cos(math.radians(self.rot + 180 - PL_ANGLE / 2)) * self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 - PL_ANGLE / 2)) * self.size + self.pos[1]
+        vertices.append((x, y))
+
+        # 4 right
+        x = math.cos(math.radians(self.rot)) * self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot)) * self.size + self.pos[1]
+        vertices.append((x, y))
+
+        return vertices
+
+    def update(self, delta):
+        mouse_pos = pygame.mouse.get_pos()
+        if pygame.mouse.get_pressed()[0]:
+            self.pos = mouse_pos
+
+        # point ship at mouse
+        mouse_pos = pygame.mouse.get_pos()
+        self.rot = degrees_between_points(self.pos, mouse_pos)
+        super().update(delta)
 
     def draw(self, screen):
         global world
 
-        # point ship at mouse
-        mouse_pos = pygame.mouse.get_pos()
-        angle = degrees_between_points(self.pos, mouse_pos)
+        if self.overlaps(world[1]):
+            color = (255, 0, 0)
+        else:
+            color = (255, 255, 255)
 
-        draw_cone(screen, self.pos, self.size, angle)
-
-        # draw raycast
-        ray_end = raycast_get_closest_point(self.pos, angle)
-        pygame.draw.line(screen, (255, 0, 0), self.pos, ray_end)
-
-
-class GameObject:
-    def __init__(self):
-        global world
-        world.append(self)
-
-    def overlaps(self, begin, end) -> (int, int):
-        return None
+        pygame.draw.line(screen, color, self.vertices[0], self.vertices[4])
+        pygame.draw.line(screen, color, self.vertices[1], self.vertices[4])
+        pygame.draw.line(screen, color, self.vertices[2], self.vertices[4])
+        pygame.draw.line(screen, color, self.vertices[3], self.vertices[4])
+        pygame.draw.line(screen, color, self.vertices[0], self.vertices[2])
+        pygame.draw.line(screen, color, self.vertices[1], self.vertices[3])
+        pygame.draw.line(screen, color, self.vertices[2], self.vertices[3])
+        pygame.draw.line(screen, color, self.vertices[3], self.vertices[4])
+        pygame.draw.line(screen, color, self.vertices[0], self.vertices[1])
 
 
-class Asteroid(GameObject):
+class Asteroid(Polygon):
     def __init__(self, pos, radius, samples, seed=69):
         super().__init__()
         self.pos = pos
@@ -53,10 +147,9 @@ class Asteroid(GameObject):
         self.rot = 0
         self.seed = seed
         self.samples = samples
-        self.closest = 0
         self.vertices = self.gen_vertices()
 
-    def gen_vertices(self):
+    def gen_vertices(self) -> []:
         inner_radius = 10
         random.seed(self.seed)
 
@@ -76,72 +169,14 @@ class Asteroid(GameObject):
         return vertices
 
     def update(self, delta):
+        super().update(delta)
         self.rot += delta * 10
-        self.vertices = self.gen_vertices()
 
     def draw(self, screen):
         for i in range(len(self.vertices) - 1):
             color = (0, 255, 0)
-            if self.closest == i:
-                color = (255, 0, 0)
             pygame.draw.line(screen, color, self.vertices[i], self.vertices[i + 1])
-
         pygame.draw.line(screen, (0, 255, 0), self.vertices[0], self.vertices[len(self.vertices) - 1])
-
-        # pygame.draw.circle(screen, (0, 50, 255), self.pos, self.radius, 1)
-
-    def overlaps(self, begin, end) -> (int, int):
-        segments = []
-        margin = 20
-        smallest = sys.float_info.max
-        smallest_index = 0
-        for i in range(len(self.vertices) - 1):
-            segments.append((self.vertices[i], self.vertices[i + 1]))
-            dis = distance_point_to_line(end, self.vertices[i], self.vertices[i + 1])
-            if smallest > dis:
-                smallest = dis
-                smallest_index = i
-        if smallest < margin:
-            # get intersection
-            a = (self.vertices[smallest_index], self.vertices[smallest_index + 1])
-            b = (begin, end)
-            return line_intersection(a, b)
-        return None
-
-
-def draw_cone(screen, pos, radius, rot):
-    x = math.cos(math.radians(rot + 180 + PL_ANGLE)) * radius + pos[0]
-    y = math.sin(math.radians(rot + 180 + PL_ANGLE)) * radius + pos[1]
-    top_left = (x, y)
-
-    x = math.cos(math.radians(rot + 180 - PL_ANGLE)) * radius + pos[0]
-    y = math.sin(math.radians(rot + 180 - PL_ANGLE)) * radius + pos[1]
-    bot_left = (x, y)
-
-    x = math.cos(math.radians(rot + 180 + PL_ANGLE / 2)) * radius + pos[0]
-    y = math.sin(math.radians(rot + 180 + PL_ANGLE / 2)) * radius + pos[1]
-    top_left_inner = (x, y)
-
-    x = math.cos(math.radians(rot + 180 - PL_ANGLE / 2)) * radius + pos[0]
-    y = math.sin(math.radians(rot + 180 - PL_ANGLE / 2)) * radius + pos[1]
-    bot_left_inner = (x, y)
-
-    x = math.cos(math.radians(rot)) * radius + pos[0]
-    y = math.sin(math.radians(rot)) * radius + pos[1]
-    right = (x, y)
-
-    pygame.draw.line(screen, FG, top_left, right)
-    pygame.draw.line(screen, FG, bot_left, right)
-    pygame.draw.line(screen, FG, top_left_inner, right)
-    pygame.draw.line(screen, FG, bot_left_inner, right)
-    pygame.draw.line(screen, FG, top_left, top_left_inner)
-    pygame.draw.line(screen, FG, bot_left, bot_left_inner)
-    pygame.draw.line(screen, FG, top_left_inner, bot_left_inner)
-    pygame.draw.line(screen, FG, bot_left_inner, right)
-    pygame.draw.line(screen, FG, top_left, bot_left)
-
-    # pygame.draw.circle(screen, (255, 0, 0), player["pos"], 2)
-    # pygame.draw.circle(screen, (200, 60, 60), player["pos"], player["size"], 1)
 
 
 def degrees_between_points(src, target):
@@ -177,49 +212,6 @@ def distance_point_to_line(point, start, end):
     dx = point[0] - xx
     dy = point[1] - yy
     return math.sqrt(dx * dx + dy * dy)
-
-
-# https://stackoverflow.com/questions/20677795/how-do-i-compute-the-intersection-point-of-two-lines
-def line_intersection(first, second) -> (int, int):
-    xdiff = (first[0][0] - first[1][0], second[0][0] - second[1][0])
-    ydiff = (first[0][1] - first[1][1], second[0][1] - second[1][1])
-
-    def det(a, b):
-        return a[0] * b[1] - a[1] * b[0]
-
-    div = det(xdiff, ydiff)
-    if div == 0:
-        return None
-
-    d = (det(*first), det(*second))
-    x = det(d, xdiff) / div
-    y = det(d, ydiff) / div
-    return x, y
-
-
-def raycast_get_closest_point(source, angle):
-    steps = 100
-    step_distance = 10
-
-    scan_x = source[0]
-    scan_y = source[1]
-    touching = False
-
-    i = 0
-    while not touching and i < steps:
-        scan_x = source[0] + math.cos(math.radians(angle)) * i * step_distance
-        scan_y = source[0] + math.sin(math.radians(angle)) * i * step_distance
-        for item in world:
-            assert (issubclass(type(item), GameObject))
-            overlaps = item.overlaps(source, (scan_x, scan_y))
-            if overlaps is not None:
-                scan_x = overlaps[0]
-                scan_y = overlaps[1]
-                touching = True
-                break
-        i += 1
-
-    return scan_x, scan_y
 
 
 def start():
