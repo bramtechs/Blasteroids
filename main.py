@@ -1,5 +1,6 @@
 import math
 import random
+from abc import abstractmethod
 
 import pygame
 import sys
@@ -11,16 +12,20 @@ FPS = 60
 
 PL_ANGLE = 30
 
+world = []
+
 
 class Player:
     def __init__(self, pos, size):
         self.pos = pos
         self.size = size
 
-    def update(self,delta):
+    def update(self, delta):
         pass
 
     def draw(self, screen):
+        global world
+
         # point ship at mouse
         mouse_pos = pygame.mouse.get_pos()
         angle = degrees_between_points(self.pos, mouse_pos)
@@ -32,8 +37,18 @@ class Player:
         pygame.draw.line(screen, (255, 0, 0), self.pos, ray_end)
 
 
-class Asteroid:
+class GameObject:
+    def __init__(self):
+        global world
+        world.append(self)
+
+    def overlaps(self, scan) -> bool:
+        return False
+
+
+class Asteroid(GameObject):
     def __init__(self, pos, radius, samples, seed=69):
+        super().__init__()
         self.pos = pos
         self.radius = radius
         self.rot = 0
@@ -67,6 +82,12 @@ class Asteroid:
         pygame.draw.line(screen, (0, 255, 0), self.vertices[0], self.vertices[len(self.vertices) - 1])
 
         pygame.draw.circle(screen, (0, 50, 255), self.pos, self.radius, 1)
+
+    def overlaps(self, scan) -> bool:
+        dis = math.dist(scan, self.pos)
+        if dis <= self.radius:
+            return True
+        return False
 
 
 def draw_cone(screen, pos, radius, rot):
@@ -111,12 +132,26 @@ def degrees_between_points(src, target):
 
 
 def raycast_get_closest_point(source, angle):
-    max_range = 5000
+    steps = 100
+    step_distance = 10
 
-    x = source[0] + math.cos(math.radians(angle)) * max_range
-    y = source[0] + math.sin(math.radians(angle)) * max_range
+    scan_x = source[0]
+    scan_y = source[1]
+    touching = False
 
-    return (x, y)
+    i = 0
+    while not touching and i < steps:
+        scan_x = source[0] + math.cos(math.radians(angle)) * i * step_distance
+        scan_y = source[0] + math.sin(math.radians(angle)) * i * step_distance
+        for item in world:
+            assert (issubclass(type(item), GameObject))
+            overlaps = item.overlaps((scan_x, scan_y))
+            if overlaps:
+                touching = True
+                break
+        i += 1
+
+    return scan_x, scan_y
 
 
 def start():
