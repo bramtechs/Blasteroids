@@ -12,29 +12,61 @@ FPS = 60
 PL_ANGLE = 30
 
 
-def asteroid_draw(screen, pos, radius, samples, rot, seed=69):
-    inner_radius = 10
-    random.seed(seed)
+class Player:
+    def __init__(self, pos, size):
+        self.pos = pos
+        self.size = size
 
-    vertices = []
-    angle_per_seg = 360 / samples
-    for i in range(samples):
-        angle = angle_per_seg * i + rot
-        x = radius * math.cos(math.radians(angle))
-        y = radius * math.sin(math.radians(angle))
+    def update(self,delta):
+        pass
 
-        inner_angle = random.randrange(0, 360)
-        inner_x = math.cos(math.radians(inner_angle + rot)) * inner_radius
-        inner_y = math.sin(math.radians(inner_angle + rot)) * inner_radius
+    def draw(self, screen):
+        # point ship at mouse
+        mouse_pos = pygame.mouse.get_pos()
+        angle = degrees_between_points(self.pos, mouse_pos)
 
-        result = (pos[0] + x + inner_x, pos[1] + y + inner_y)
-        vertices.append(result)
+        draw_cone(screen, self.pos, self.size, angle)
 
-    for i in range(samples - 1):
-        pygame.draw.line(screen, (0, 255, 0), vertices[i], vertices[i + 1])
-    pygame.draw.line(screen, (0, 255, 0), vertices[0], vertices[len(vertices) - 1])
+        # draw raycast
+        ray_end = raycast_get_closest_point(self.pos, angle)
+        pygame.draw.line(screen, (255, 0, 0), self.pos, ray_end)
 
-    # pygame.draw.circle(screen, (0, 255, 0), pos, 3)
+
+class Asteroid:
+    def __init__(self, pos, radius, samples, seed=69):
+        self.pos = pos
+        self.radius = radius
+        self.rot = 0
+        self.vertices = self.gen_vertices(seed, samples)
+
+    def gen_vertices(self, seed, samples):
+        inner_radius = 10
+        random.seed(seed)
+
+        vertices = []
+        angle_per_seg = 360 / samples
+        for i in range(samples):
+            angle = angle_per_seg * i + self.rot
+            x = self.radius * math.cos(math.radians(angle))
+            y = self.radius * math.sin(math.radians(angle))
+
+            inner_angle = random.randrange(0, 360)
+            inner_x = math.cos(math.radians(inner_angle + self.rot)) * inner_radius
+            inner_y = math.sin(math.radians(inner_angle + self.rot)) * inner_radius
+
+            result = (self.pos[0] + x + inner_x, self.pos[1] + y + inner_y)
+            vertices.append(result)
+        return vertices
+
+    def update(self, delta):
+        pass
+
+    def draw(self, screen):
+        for i in range(len(self.vertices) - 1):
+            pygame.draw.line(screen, (0, 255, 0), self.vertices[i], self.vertices[i + 1])
+        pygame.draw.line(screen, (0, 255, 0), self.vertices[0], self.vertices[len(self.vertices) - 1])
+
+        pygame.draw.circle(screen, (0, 50, 255), self.pos, self.radius, 1)
 
 
 def draw_cone(screen, pos, radius, rot):
@@ -78,26 +110,24 @@ def degrees_between_points(src, target):
     return math.degrees(math.atan2(delta_y, delta_x))
 
 
-def player_draw(screen, player):
-    # point ship at mouse
-    mouse_pos = pygame.mouse.get_pos()
-    angle = degrees_between_points(player["pos"], mouse_pos)
+def raycast_get_closest_point(source, angle):
+    max_range = 5000
 
-    draw_cone(screen, player["pos"], player["size"], angle)
+    x = source[0] + math.cos(math.radians(angle)) * max_range
+    y = source[0] + math.sin(math.radians(angle)) * max_range
+
+    return (x, y)
 
 
 def start():
     pygame.init()
     size = width, height = 640, 480
 
-    player = {
-        "pos": (200, 200),
-        "size": 30,
-        "rot": 40
-    }
+    player = Player((200, 200), 30)
     screen = pygame.display.set_mode(size)
 
-    rot = 0
+    asteroid = Asteroid((450, 80), 70, 30)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -106,12 +136,13 @@ def start():
         delta = 1 / FPS
 
         screen.fill(BG)
-        player_draw(screen, player)
-        asteroid_draw(screen, (450, 80), 70, 30, rot)
-        pygame.display.flip()
 
-        player["rot"] += delta * 20
-        rot += delta * 50
+        player.update(delta)
+        player.draw(screen)
+
+        asteroid.update(delta)
+        asteroid.draw(screen)
+        pygame.display.flip()
 
         pygame.time.wait(int(1000 / FPS))
 
