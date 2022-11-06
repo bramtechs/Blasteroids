@@ -1,4 +1,6 @@
 import math
+import random
+
 import pygame
 import sys
 
@@ -10,18 +12,29 @@ FPS = 60
 PL_ANGLE = 30
 
 
-def asteroid_draw(screen, rect, samples):
-    half_width = rect[2] / 2
-    half_height = rect[3] / 2
+def asteroid_draw(screen, pos, radius, samples, rot, seed=69):
+    inner_radius = 10
+    random.seed(seed)
 
-    next_angle = 0
+    vertices = []
+    angle_per_seg = 360 / samples
     for i in range(samples):
-        x = half_width * math.cos(math.radians(next_angle))
-        y = half_height * math.sin(math.radians(next_angle))
+        angle = angle_per_seg * i + rot
+        x = radius * math.cos(math.radians(angle))
+        y = radius * math.sin(math.radians(angle))
 
-        pygame.draw.circle(screen, (0, 255, 255), (rect[0] + x, rect[1] + y), 3)
+        inner_angle = random.randrange(0, 360)
+        inner_x = math.cos(math.radians(inner_angle + rot)) * inner_radius
+        inner_y = math.sin(math.radians(inner_angle + rot)) * inner_radius
 
-        next_angle += 360 / samples
+        result = (pos[0] + x + inner_x, pos[1] + y + inner_y)
+        vertices.append(result)
+
+    for i in range(samples - 1):
+        pygame.draw.line(screen, (0, 255, 0), vertices[i], vertices[i + 1])
+    pygame.draw.line(screen, (0, 255, 0), vertices[0], vertices[len(vertices) - 1])
+
+    # pygame.draw.circle(screen, (0, 255, 0), pos, 3)
 
 
 def draw_cone(screen, pos, radius, rot):
@@ -84,6 +97,7 @@ def start():
     }
     screen = pygame.display.set_mode(size)
 
+    rot = 0
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -93,10 +107,11 @@ def start():
 
         screen.fill(BG)
         player_draw(screen, player)
-        asteroid_draw(screen, (150, 50, 300, 50), 30)
+        asteroid_draw(screen, (450, 80), 70, 30, rot)
         pygame.display.flip()
 
         player["rot"] += delta * 20
+        rot += delta * 50
 
         pygame.time.wait(int(1000 / FPS))
 
