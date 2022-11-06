@@ -42,8 +42,8 @@ class GameObject:
         global world
         world.append(self)
 
-    def overlaps(self, scan) -> bool:
-        return False
+    def overlaps(self, scan) -> (int, int):
+        return None
 
 
 class Asteroid(GameObject):
@@ -52,15 +52,18 @@ class Asteroid(GameObject):
         self.pos = pos
         self.radius = radius
         self.rot = 0
-        self.vertices = self.gen_vertices(seed, samples)
+        self.seed = seed
+        self.samples = samples
+        self.closest = 0
+        self.vertices = self.gen_vertices()
 
-    def gen_vertices(self, seed, samples):
+    def gen_vertices(self):
         inner_radius = 10
-        random.seed(seed)
+        random.seed(self.seed)
 
         vertices = []
-        angle_per_seg = 360 / samples
-        for i in range(samples):
+        angle_per_seg = 360 / self.samples
+        for i in range(self.samples):
             angle = angle_per_seg * i + self.rot
             x = self.radius * math.cos(math.radians(angle))
             y = self.radius * math.sin(math.radians(angle))
@@ -74,20 +77,35 @@ class Asteroid(GameObject):
         return vertices
 
     def update(self, delta):
-        pass
+        self.rot += delta * 10
+        self.vertices = self.gen_vertices()
 
     def draw(self, screen):
         for i in range(len(self.vertices) - 1):
-            pygame.draw.line(screen, (0, 255, 0), self.vertices[i], self.vertices[i + 1])
+            color = (0, 255, 0)
+            if self.closest == i:
+                color = (255, 0, 0)
+            pygame.draw.line(screen, color, self.vertices[i], self.vertices[i + 1])
+
         pygame.draw.line(screen, (0, 255, 0), self.vertices[0], self.vertices[len(self.vertices) - 1])
 
         pygame.draw.circle(screen, (0, 50, 255), self.pos, self.radius, 1)
 
-    def overlaps(self, scan) -> bool:
-        dis = math.dist(scan, self.pos)
-        if dis <= self.radius:
-            return True
-        return False
+    def overlaps(self, scan) -> (int, int):
+        segments = []
+        margin = 20
+        smallest = sys.float_info.max
+        smallest_index = 0
+        for i in range(len(self.vertices) - 1):
+            segments.append((self.vertices[i], self.vertices[i + 1]))
+            dis = distance_point_to_line(scan, self.vertices[i], self.vertices[i+1])
+            if smallest > dis:
+                smallest = dis
+                smallest_index = i
+        if smallest < margin:
+            # get intersection
+            return self.vertices[smallest_index]
+        return None
 
 
 def draw_cone(screen, pos, radius, rot):
@@ -131,6 +149,35 @@ def degrees_between_points(src, target):
     return math.degrees(math.atan2(delta_y, delta_x))
 
 
+# do I look like a mathematician?
+# https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+def distance_point_to_line(point, start, end):
+    a = point[0] - start[0]
+    b = point[1] - start[1]
+    c = end[0] - start[0]
+    d = end[1] - start[1]
+
+    dot = a * c + b * d
+    len_sq = c * c + d * d
+    param = -1
+    if len_sq != 0:
+        param = dot / len_sq
+
+    if param < 0:
+        xx = start[0]
+        yy = start[1]
+    elif param > 1:
+        xx = end[0]
+        yy = end[1]
+    else:
+        xx = start[0] + param * c
+        yy = start[1] + param * d
+
+    dx = point[0] - xx
+    dy = point[1] - yy
+    return math.sqrt(dx * dx + dy * dy)
+
+
 def raycast_get_closest_point(source, angle):
     steps = 100
     step_distance = 10
@@ -146,7 +193,9 @@ def raycast_get_closest_point(source, angle):
         for item in world:
             assert (issubclass(type(item), GameObject))
             overlaps = item.overlaps((scan_x, scan_y))
-            if overlaps:
+            if overlaps is not None:
+                scan_x = overlaps[0]
+                scan_y = overlaps[1]
                 touching = True
                 break
         i += 1
