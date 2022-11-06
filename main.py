@@ -1,6 +1,5 @@
 import math
 import random
-from abc import abstractmethod
 
 import pygame
 import sys
@@ -42,7 +41,7 @@ class GameObject:
         global world
         world.append(self)
 
-    def overlaps(self, scan) -> (int, int):
+    def overlaps(self, begin, end) -> (int, int):
         return None
 
 
@@ -89,22 +88,24 @@ class Asteroid(GameObject):
 
         pygame.draw.line(screen, (0, 255, 0), self.vertices[0], self.vertices[len(self.vertices) - 1])
 
-        pygame.draw.circle(screen, (0, 50, 255), self.pos, self.radius, 1)
+        # pygame.draw.circle(screen, (0, 50, 255), self.pos, self.radius, 1)
 
-    def overlaps(self, scan) -> (int, int):
+    def overlaps(self, begin, end) -> (int, int):
         segments = []
         margin = 20
         smallest = sys.float_info.max
         smallest_index = 0
         for i in range(len(self.vertices) - 1):
             segments.append((self.vertices[i], self.vertices[i + 1]))
-            dis = distance_point_to_line(scan, self.vertices[i], self.vertices[i+1])
+            dis = distance_point_to_line(end, self.vertices[i], self.vertices[i + 1])
             if smallest > dis:
                 smallest = dis
                 smallest_index = i
         if smallest < margin:
             # get intersection
-            return self.vertices[smallest_index]
+            a = (self.vertices[smallest_index], self.vertices[smallest_index + 1])
+            b = (begin, end)
+            return line_intersection(a, b)
         return None
 
 
@@ -178,6 +179,24 @@ def distance_point_to_line(point, start, end):
     return math.sqrt(dx * dx + dy * dy)
 
 
+# https://stackoverflow.com/questions/20677795/how-do-i-compute-the-intersection-point-of-two-lines
+def line_intersection(first, second) -> (int, int):
+    xdiff = (first[0][0] - first[1][0], second[0][0] - second[1][0])
+    ydiff = (first[0][1] - first[1][1], second[0][1] - second[1][1])
+
+    def det(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    div = det(xdiff, ydiff)
+    if div == 0:
+        return None
+
+    d = (det(*first), det(*second))
+    x = det(d, xdiff) / div
+    y = det(d, ydiff) / div
+    return x, y
+
+
 def raycast_get_closest_point(source, angle):
     steps = 100
     step_distance = 10
@@ -192,7 +211,7 @@ def raycast_get_closest_point(source, angle):
         scan_y = source[0] + math.sin(math.radians(angle)) * i * step_distance
         for item in world:
             assert (issubclass(type(item), GameObject))
-            overlaps = item.overlaps((scan_x, scan_y))
+            overlaps = item.overlaps(source, (scan_x, scan_y))
             if overlaps is not None:
                 scan_x = overlaps[0]
                 scan_y = overlaps[1]
