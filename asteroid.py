@@ -1,4 +1,5 @@
 import bullet
+from gui.bar import Bar
 from poly import Polygon
 import random
 import math
@@ -17,6 +18,12 @@ class Asteroid(Polygon):
         self.rot_speed = random.randint(-30, 30)
         self.samples = samples
         self.vertices = self.gen_vertices()
+        self.bounds = (self.pos[0] - self.radius, self.pos[1] - self.radius, self.radius * 2, self.radius * 2)
+
+        self.health = 100
+        self.max_health = 100
+
+        self.bar = Bar()
 
     def gen_vertices(self) -> []:
         inner_radius = 10
@@ -42,12 +49,19 @@ class Asteroid(Polygon):
         self.rot += delta * self.rot_speed
 
         # catch incoming bullets
-        bullet.catch(self)
+        if bullet.catch(self):
+            self.health -= 20
+            # TODO split in two
+
+        self.bar.update(delta, self.health, 0, self.max_health)
 
     def draw(self, screen, color):
         for i in range(len(self.vertices) - 1):
             pygame.draw.line(screen, color, self.vertices[i], self.vertices[i + 1])
         pygame.draw.line(screen, color, self.vertices[0], self.vertices[len(self.vertices) - 1])
+
+        self.bar.draw(screen, color, self.pos, (self.bounds[2], self.bounds[3]))
+        # pygame.draw.rect(screen, (255, 0, 0), self.bounds, 1)
 
 
 def init_test():
