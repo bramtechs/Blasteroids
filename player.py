@@ -1,4 +1,5 @@
 from poly import Polygon
+import main
 import math
 import meth
 import bullet
@@ -6,6 +7,9 @@ import pygame
 
 PL_ANGLE = 30
 SHOOT_INTERVAL = 0.2
+THRUST = 10
+
+WRAP_BOUNDS = 60
 
 
 class Player(Polygon):
@@ -14,6 +18,7 @@ class Player(Polygon):
         self.pos = pos
         self.size = size
         self.rot = 0
+        self.vel = (0, 0)
         self.vertices = self.gen_vertices()
         self.shoot_timer = 0
 
@@ -53,10 +58,33 @@ class Player(Polygon):
         self.rot = meth.degrees_between_points(self.pos, mouse_pos)
         super().update(delta)
 
+        # thrust while holding right mouse button
+        if pygame.mouse.get_pressed()[2]:
+            self.vel = meth.add_points(self.vel, (
+                math.cos(math.radians(self.rot)) * THRUST,
+                math.sin(math.radians(self.rot)) * THRUST
+            ))
+
+        # wrap ship around
+        if self.pos[0] - self.size < -WRAP_BOUNDS:
+            self.pos = meth.add_points(self.pos, (main.SIZE[0], 0))
+        if self.pos[0] > main.SIZE[0] + WRAP_BOUNDS:
+            self.pos = meth.add_points(self.pos, (-main.SIZE[0], 0))
+
+        if self.pos[1] > main.SIZE[1] + WRAP_BOUNDS:
+            self.pos = meth.add_points(self.pos, (0, -main.SIZE[0]))
+        if self.pos[1] - self.size < -WRAP_BOUNDS:
+            self.pos = meth.add_points(self.pos, (0, main.SIZE[0]))
+
+        # shoot when holding left mouse button
         if pygame.mouse.get_pressed()[0] and self.shoot_timer > SHOOT_INTERVAL:
             bullet.shoot(self.vertices[4], self.rot)
             self.shoot_timer = 0
         self.shoot_timer += delta
+
+        # apply velocity to position
+        scaled_vel = meth.scl_point(self.vel, delta)
+        self.pos = meth.add_points(self.pos, scaled_vel)
 
     def draw(self, screen, color):
         pygame.draw.line(screen, color, self.vertices[0], self.vertices[4])
