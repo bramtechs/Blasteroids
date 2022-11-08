@@ -23,8 +23,8 @@ class Asteroid(Polygon):
         self.vertices = self.gen_vertices()
         self.bounds = (self.pos[0] - self.radius, self.pos[1] - self.radius, self.radius * 2, self.radius * 2)
 
-        self.health = 100
-        self.max_health = 100
+        self.health = radius
+        self.max_health = self.health
 
         self.bar = Bar()
 
@@ -54,7 +54,7 @@ class Asteroid(Polygon):
         # catch incoming bullets
         if bullet.catch(self):
             global asteroids
-            self.health -= 20
+            self.health -= 10
             if self.health <= 0:
                 if self.radius / SPLIT_FACTOR > MIN_RADIUS:
                     # spawn two new ones
