@@ -5,6 +5,8 @@ import random
 import math
 import pygame
 
+MIN_RADIUS = 20
+SPLIT_FACTOR = 2
 asteroids = []
 
 
@@ -13,6 +15,7 @@ class Asteroid(Polygon):
         super().__init__()
         self.pos = pos
         self.radius = radius
+        assert (self.radius > MIN_RADIUS)
         self.rot = 0
         self.seed = random.randint(0, 10000)
         self.rot_speed = random.randint(-30, 30)
@@ -50,8 +53,17 @@ class Asteroid(Polygon):
 
         # catch incoming bullets
         if bullet.catch(self):
+            global asteroids
             self.health -= 20
-            # TODO split in two
+            if self.health <= 0:
+                if self.radius / SPLIT_FACTOR > MIN_RADIUS:
+                    # spawn two new ones
+                    pos = self.vertices[random.randint(0, int(len(self.vertices) / 2))]
+                    pos_alter = self.vertices[random.randint(int(len(self.vertices) / 2), int(len(self.vertices) - 1))]
+                    asteroids.append(Asteroid(pos, self.radius / SPLIT_FACTOR, random.randint(10, 25)))
+                    asteroids.append(Asteroid(pos_alter, self.radius / SPLIT_FACTOR, random.randint(10, 25)))
+                # ded
+                asteroids.remove(self)
 
         self.bar.update(delta, self.health, 0, self.max_health)
 
