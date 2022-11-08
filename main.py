@@ -9,15 +9,15 @@ from player import Player
 BG = (0, 0, 0)
 FG = (255, 255, 255)
 
+SIZE = 640, 480
 FPS = 60
 
 
 def start():
     pygame.init()
-    size = width, height = 640, 480
 
     player = Player((500, 300), 30)
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode(SIZE)
     pygame.display.set_caption("pygame asteroids")
 
     asteroid.init_test()

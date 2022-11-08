@@ -1,9 +1,11 @@
 import math
 
+import main
 import meth
 from poly import Polygon
 import pygame
 
+BOUNDS = 200
 bullets = []
 
 
@@ -20,6 +22,12 @@ class Bullet(Polygon):
         self.prev_pos = self.pos
         scaled_vel = meth.scl_point(self.vel, delta)
         self.pos = meth.add_points(self.pos, scaled_vel)
+
+        # remove out of bounds
+        if self.pos[0] < -BOUNDS or self.pos[0] > main.SIZE[0] + BOUNDS or self.pos[1] < -BOUNDS or self.pos[1] > \
+                main.SIZE[1] + BOUNDS:
+            global bullets
+            bullets.remove(self)
 
     def draw(self, screen, color):
         pygame.draw.line(screen, color, self.pos, self.prev_pos)
