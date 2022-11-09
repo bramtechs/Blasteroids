@@ -17,7 +17,6 @@ class Polygon:
         # https://www.youtube.com/watch?v=7Ik2vowGcU0
 
     def overlaps(self, other) -> bool:
-        assert (self is not other)
         poly1 = self
         poly2 = other
 
