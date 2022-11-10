@@ -15,8 +15,7 @@ def update(player: Player, delta):
     global timer
     timer += delta
 
-    slowness = asteroid.get_count() * 0.3
-    if timer > INTERVAL + slowness:
+    if timer > INTERVAL:
         # spawn new asteroid
         asteroid.spawn(player)
         timer = 0
