@@ -29,7 +29,7 @@ class Particle:
         self.life_time = 2
 
         # rng
-        rng = 5
+        rng = 2
         power += random.randint(power - power / rng, power + power / rng)
 
         angle = random.randint(0, 359)

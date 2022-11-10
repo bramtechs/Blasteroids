@@ -23,11 +23,12 @@ class Bar:
         )
 
     def draw(self, surface, color, owner_pos, owner_size):
-        perc = (self.value - self.min) / (self.max - self.min)
-        # draw outline
-        rect = self.get_rect(owner_pos, owner_size, 1)
-        pygame.draw.rect(surface, color, rect, 1)
+        if self.value < self.max:
+            perc = (self.value - self.min) / (self.max - self.min)
+            # draw outline
+            rect = self.get_rect(owner_pos, owner_size, 1)
+            pygame.draw.rect(surface, color, rect, 1)
 
-        # draw inside
-        rect = self.get_rect(owner_pos, owner_size, perc)
-        pygame.draw.rect(surface, color, rect)
+            # draw inside
+            rect = self.get_rect(owner_pos, owner_size, perc)
+            pygame.draw.rect(surface, color, rect)
