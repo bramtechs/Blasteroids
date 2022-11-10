@@ -2,7 +2,7 @@ import asteroid
 from player import Player
 
 DURATION = 2
-INTERVAL = 2
+INTERVAL = 1.8
 timer = 0
 
 

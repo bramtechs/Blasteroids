@@ -11,7 +11,9 @@ import pygame
 MIN_RADIUS = 20
 SPLIT_FACTOR = 2
 asteroids = []
-OOB = 300
+
+OOB = 1200
+SPAWN_RANGE = 800
 
 
 class Asteroid(Polygon):
@@ -77,8 +79,8 @@ class Asteroid(Polygon):
             return
 
         # remove when out of bounds
-        if self.pos[1] < -OOB or self.pos[1] > OOB + main.SIZE[1] or self.pos[0] < -OOB or self.pos[0] > OOB + \
-                main.SIZE[0]:
+        dist = math.dist(self.pos, meth.scl_point(main.SIZE, 0.5))
+        if dist > OOB:
             asteroids.remove(self)
 
         # drift through space
@@ -119,25 +121,15 @@ def init_test():
 
 
 def spawn(player: Player):
-    # choose border
-    match random.randint(0, 3):
-        case 0:
-            # left
-            pos = (0, random.randint(0, main.SIZE[1]))
-        case 1:
-            # right
-            pos = (main.SIZE[0], random.randint(0, main.SIZE[1]))
-        case 2:
-            # down
-            pos = (random.randint(0, main.SIZE[0]), main.SIZE[1])
-        case 3:
-            # up
-            pos = (random.randint(0, main.SIZE[0]), 0)
-        case other:
-            pos = (0, 0)
-
     # spawn the new asteroid
     radius = random.randint(21, 80)
+
+    # choose spawn
+    angle = random.randint(0, 359)
+    pos = (
+        math.cos(math.radians(angle)) * SPAWN_RANGE + main.SIZE[0] * 0.5,
+        math.sin(math.radians(angle)) * SPAWN_RANGE + main.SIZE[1] * 0.5
+    )
     samples = random.randint(15, 30)
     deg_towards = meth.degrees_between_points(pos, player.pos)
     power = random.randint(30, 150)
