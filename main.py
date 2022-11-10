@@ -4,6 +4,7 @@ import pygame
 
 import asteroid
 import bullet
+import particles
 import spawner
 from player import Player
 
@@ -25,8 +26,12 @@ def start():
     # TODO write a system for this
     pressing_space = False
 
+    particles.init()
+
+    clock = pygame.time.Clock()
+
     while True:
-        delta = 1 / FPS
+        delta = clock.get_time() / 1000.0
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -52,11 +57,14 @@ def start():
         asteroid.update(delta)
         asteroid.draw(screen, FG)
 
+        particles.update(delta)
+        particles.draw(screen, FG)
+
         spawner.update(player, delta)
 
         pygame.display.flip()
 
-        pygame.time.wait(int(1000 / FPS))
+        clock.tick(FPS)
 
 
 if __name__ == '__main__':

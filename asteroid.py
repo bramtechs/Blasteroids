@@ -25,18 +25,21 @@ class Asteroid(Polygon):
         self.seed = random.randint(0, 10000)
         self.rot_speed = random.randint(-30, 30)
         self.samples = samples
-        self.vertices = self.gen_vertices()
-        self.bounds = (self.pos[0] - self.radius, self.pos[1] - self.radius, self.radius * 2, self.radius * 2)
+
+        self.rand_angles = []
+        for i in range(self.samples):
+            self.rand_angles.append(random.randrange(0, 360))
 
         self.health = radius
         self.max_health = self.health
+
+        self.vertices = self.gen_vertices()
+        self.bounds = (self.pos[0] - self.radius, self.pos[1] - self.radius, self.radius * 2, self.radius * 2)
 
         self.bar = Bar()
 
     def gen_vertices(self) -> []:
         inner_radius = 10
-        random.seed(self.seed)
-
         vertices = []
         angle_per_seg = 360 / self.samples
         for i in range(self.samples):
@@ -44,7 +47,7 @@ class Asteroid(Polygon):
             x = self.radius * math.cos(math.radians(angle))
             y = self.radius * math.sin(math.radians(angle))
 
-            inner_angle = random.randrange(0, 360)
+            inner_angle = self.rand_angles[i]
             inner_x = math.cos(math.radians(inner_angle + self.rot)) * inner_radius
             inner_y = math.sin(math.radians(inner_angle + self.rot)) * inner_radius
 
@@ -71,6 +74,7 @@ class Asteroid(Polygon):
                 asteroids.append(Asteroid(pos_alter, self.radius / SPLIT_FACTOR, random.randint(10, 25), self.vel))
             # ded
             asteroids.remove(self)
+            return
 
         # remove when out of bounds
         if self.pos[1] < -OOB or self.pos[1] > OOB + main.SIZE[1] or self.pos[0] < -OOB or self.pos[0] > OOB + \

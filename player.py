@@ -1,4 +1,6 @@
 from pygame import *
+
+import particles
 from poly import Polygon
 
 import main
@@ -13,6 +15,7 @@ SHOOT_INTERVAL = 0.2
 THRUST = 10
 CRASH_SPEED = 30
 WRAP_BOUNDS = 60
+CRASH_PARTICLE_COUNT = 100
 
 
 class Player(Polygon):
@@ -89,6 +92,7 @@ class Player(Polygon):
         # detect crashes
         # speed = math.sqrt(self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1])
         if asteroid.overlaps(self):
+            particles.emit(self.pos, 100, 3, 2, CRASH_PARTICLE_COUNT)
             self.died()
 
     def accelerate(self, delta):
