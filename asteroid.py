@@ -12,8 +12,8 @@ MIN_RADIUS = 20
 SPLIT_FACTOR = 2
 asteroids = []
 
-OOB = 1200
-SPAWN_RANGE = 800
+OOB = main.SIZE[0] + 400
+SPAWN_RANGE = main.SIZE[0] + 200
 
 
 class Asteroid(Polygon):
