@@ -8,7 +8,7 @@ timer = 0
 
 def init():
     global timer
-    timer = 0
+    timer = INTERVAL
 
 
 def update(player: Player, delta):

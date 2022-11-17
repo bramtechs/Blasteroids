@@ -8,11 +8,12 @@ import asteroid
 import bullet
 import particles
 import spawner
+from gui import labels
 from opengl import surface_to_texture, texID
 from player import Player
 
-BG = (0, 0, 0)
-FG = (255, 255, 255)
+BG = (7, 12, 4)
+FG = (0, 255, 0)
 
 SIZE = 640, 480
 FPS = 60
@@ -49,7 +50,11 @@ def start():
     spawner.init()
     particles.init()
 
+    score = labels.Label((10, 10))
+
     clock = pygame.time.Clock()
+
+    # shaders
 
     while True:
         delta = clock.get_time() / 1000.0
@@ -82,6 +87,8 @@ def start():
         particles.draw(screen_buffer, FG)
 
         spawner.update(player, delta)
+
+        score.render(screen_buffer, FG, player.score)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 

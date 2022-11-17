@@ -28,6 +28,7 @@ class Player(Polygon):
         self.vertices = self.gen_vertices()
         self.shoot_timer = 0
         self.alive = True
+        self.score = 0
 
     def gen_vertices(self) -> []:
         vertices = []
@@ -81,7 +82,7 @@ class Player(Polygon):
 
         # shoot when holding left mouse button
         if pygame.mouse.get_pressed()[0] and self.shoot_timer > SHOOT_INTERVAL:
-            bullet.shoot(self.vertices[4], self.rot)
+            bullet.shoot(self.vertices[4], self.rot, self)
             self.shoot_timer = 0
         self.shoot_timer += delta
 

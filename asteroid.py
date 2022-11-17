@@ -64,16 +64,19 @@ class Asteroid(Polygon):
         global asteroids
 
         # catch incoming bullets
-        if bullet.catch(self):
+        player = bullet.catch(self)
+        if player is not None:
             self.health -= 10
+            player.score += 10
 
         if self.health <= 0:
             if self.radius / SPLIT_FACTOR > MIN_RADIUS:
                 # spawn two new ones
                 pos = self.vertices[random.randint(0, int(len(self.vertices) / 2))]
                 pos_alter = self.vertices[random.randint(int(len(self.vertices) / 2), int(len(self.vertices) - 1))]
-                asteroids.append(Asteroid(pos, self.radius / SPLIT_FACTOR, random.randint(10, 25), self.vel))
-                asteroids.append(Asteroid(pos_alter, self.radius / SPLIT_FACTOR, random.randint(10, 25), self.vel))
+                samples = random.randint(5, 15)
+                asteroids.append(Asteroid(pos, self.radius / SPLIT_FACTOR, samples, self.vel))
+                asteroids.append(Asteroid(pos_alter, self.radius / SPLIT_FACTOR, samples, self.vel))
             # ded
             asteroids.remove(self)
             return
@@ -130,7 +133,7 @@ def spawn(player: Player):
         math.cos(math.radians(angle)) * SPAWN_RANGE + main.SIZE[0] * 0.5,
         math.sin(math.radians(angle)) * SPAWN_RANGE + main.SIZE[1] * 0.5
     )
-    samples = random.randint(15, 30)
+    samples = random.randint(8, 15)
     deg_towards = meth.degrees_between_points(pos, player.pos)
     power = random.randint(30, 150)
     vel = (

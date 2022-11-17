@@ -10,12 +10,13 @@ bullets = []
 
 
 class Bullet(Polygon):
-    def __init__(self, pos, vel, radius):
+    def __init__(self, pos, vel, radius, sender):
         super().__init__()
         self.pos = pos
         self.prev_pos = pos
         self.vel = vel
         self.radius = radius
+        self.sender = sender
 
     def update(self, delta):
         super().update(delta)
@@ -41,16 +42,16 @@ def catch(client):
     for bullet in bullets:
         if bullet.overlaps(client):
             bullets.remove(bullet)
-            return True
-    return False
+            return bullet.sender
+    return None
 
 
-def shoot(spawn, angle, speed=400):
+def shoot(spawn, angle, player, speed=400):
     vel = (
         math.cos(math.radians(angle)) * speed,
         math.sin(math.radians(angle)) * speed
     )
-    bullets.append(Bullet(spawn, vel, 3))
+    bullets.append(Bullet(spawn, vel, 3, player))
 
 
 def update(delta):
