@@ -67,7 +67,10 @@ class Asteroid(Polygon):
         player = bullet.catch(self)
         if player is not None:
             self.health -= 10
-            player.score += 10
+            if self.health > 0:
+                player.score += 10
+            else:
+                player.score += self.radius
 
         if self.health <= 0:
             if self.radius / SPLIT_FACTOR > MIN_RADIUS:

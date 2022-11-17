@@ -15,7 +15,7 @@ from player import Player
 BG = (7, 12, 4)
 FG = (0, 255, 0)
 
-SIZE = 640, 480
+SIZE = 900, 720
 FPS = 60
 
 
@@ -50,7 +50,7 @@ def start():
     spawner.init()
     particles.init()
 
-    score = labels.Label((10, 10))
+    guiLabels = labels.GUI(player)
 
     clock = pygame.time.Clock()
 
@@ -88,7 +88,7 @@ def start():
 
         spawner.update(player, delta)
 
-        score.render(screen_buffer, FG, player.score)
+        guiLabels.render(screen_buffer, delta, FG)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
