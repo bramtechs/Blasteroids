@@ -1,16 +1,13 @@
 import sys
-from OpenGL.GL import *
-from OpenGL.GLU import *
-from pygame import *
+import asyncio
 import pygame
 
 import asteroid
 import bullet
 import particles
 import spawner
-from gui import labels
-from opengl import surface_to_texture, texID
-from player import Player
+import player
+import gui.labels
 
 BG = (7, 12, 4)
 FG = (0, 255, 0)
@@ -19,7 +16,7 @@ SIZE = 900, 720
 FPS = 60
 
 
-def start():
+async def start():
     # pygame opengl setup
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
@@ -28,22 +25,21 @@ def start():
     # TODO write a system for this
     pressing_space = False
 
-    player = Player((500, 300), 30)
+    pl = player.Player((500, 300), 30)
     spawner.init()
     particles.init()
 
-    gui_labels = labels.GUI(player)
+    gui_labels = gui.labels.GUI(pl)
 
     clock = pygame.time.Clock()
 
-    # shaders
-
-    while True:
+    keep_running = True
+    while keep_running:
         delta = clock.get_time() / 1000.0
 
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
-                sys.exit()
+                keep_running = False
             if ev.type == pygame.KEYDOWN:
                 if ev.key == pygame.K_SPACE:
                     pressing_space = True
@@ -54,10 +50,10 @@ def start():
 
         screen.fill(BG)
 
-        player.update(delta)
+        pl.update(delta)
         if pressing_space:
-            player.accelerate(delta)
-        player.draw(screen, FG)
+            pl.accelerate(delta)
+        pl.draw(screen, FG)
 
         bullet.update(delta)
         bullet.draw(screen, FG)
@@ -68,7 +64,7 @@ def start():
         particles.update(delta)
         particles.draw(screen, FG)
 
-        spawner.update(player, delta)
+        spawner.update(pl, delta)
 
         gui_labels.render(screen, delta, FG)
 
@@ -76,6 +72,9 @@ def start():
 
         clock.tick(FPS)
 
+    pygame.quit()
+    sys.exit(0)
+
 
 if __name__ == '__main__':
-    start()
+    asyncio.run(start())
