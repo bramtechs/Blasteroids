@@ -1,4 +1,5 @@
 #!/bin/bash
-#sudo apt-get install -y ffmpeg pngquant
-python3 -m pip install git+https://github.com/pygame-web/pygbag
-python3 -m pygbag --PYBUILD=3.11 --build .
+
+# https://github.com/pygame-web/pygbag/blob/main/README.md
+pip3 install pygbag --upgrade
+python3 -m pygbag --app_name "Blasteroids" --build .
