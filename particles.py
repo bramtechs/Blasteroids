@@ -18,21 +18,25 @@ class Particle:
         self.life_time = 0
         self.radius = 0
         self.timer = 0.0
+        self.cone = (0, 0)
         self.is_active = False
 
-    def activate(self, pos, power, radius, life_time):
+    def activate(self, pos, cone, power, radius, life_time):
         self.pos = pos
+        self.cone = cone
         self.timer = 0.0
         self.radius = 0
         self.is_active = True
         self.start_radius = radius
-        self.life_time = 2
+        self.life_time = life_time
 
         # rng
         rng = 2
         power += random.randint(power - power / rng, power + power / rng)
 
-        angle = random.randint(0, 359)
+        assert (self.cone[0] < self.cone[1])
+        angle = random.randint(int(self.cone[0]), int(self.cone[1]))
+
         self.vel = (
             math.cos(math.radians(angle)) * power,
             math.sin(math.radians(angle)) * power
@@ -67,15 +71,15 @@ def init():
         particles.append(create_empty())
 
 
-def emit(pos, power, radius, life_time, amount=1):
+def emit(pos, power, radius, life_time, amount=1, cone: (int, int) = (0, 360)):
     done = 0
     for part in particles:
         if not part.is_active:
             if done > amount:
                 return
-            part.activate(pos, power, radius, life_time)
+            part.activate(pos, cone, power, radius, life_time)
             done += 1
-    print("not enough particles")
+    print("particle pool ran out")
 
 
 def update(delta):

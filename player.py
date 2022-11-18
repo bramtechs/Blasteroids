@@ -1,3 +1,5 @@
+import random
+
 from pygame import *
 
 import particles
@@ -93,7 +95,7 @@ class Player(Polygon):
         # detect crashes
         # speed = math.sqrt(self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1])
         if asteroid.overlaps(self):
-            particles.emit(self.pos, 100, 3, 2, CRASH_PARTICLE_COUNT)
+            particles.emit(self.pos, 100, 3, 5, CRASH_PARTICLE_COUNT)
             self.died()
 
     def accelerate(self, delta):
@@ -102,6 +104,16 @@ class Player(Polygon):
             math.cos(math.radians(self.rot)) * THRUST,
             math.sin(math.radians(self.rot)) * THRUST
         ))
+
+        # particles on tail
+        rng_angle = random.randint(-10, 10)
+        x = math.cos(math.radians(self.rot + 180 + rng_angle)) * self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 + rng_angle)) * self.size + self.pos[1]
+        cone = (
+            (self.rot + 180 - PL_ANGLE),
+            (self.rot + 180 + PL_ANGLE)
+        )
+        particles.emit((x, y), 30, 2, 1.2, amount=1, cone=cone)
 
     def died(self):
         self.alive = False
