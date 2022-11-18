@@ -68,9 +68,10 @@ async def start():
 
         gui_labels.render(screen, delta, FG)
 
-        pygame.display.flip()
+        pygame.display.update()
 
         clock.tick(FPS)
+        await asyncio.sleep(0)
 
     pygame.quit()
     sys.exit(0)
