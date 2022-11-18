@@ -1,0 +1,4 @@
+#!/bin/bash
+#sudo apt-get install -y ffmpeg pngquant
+python3 -m pip install git+https://github.com/pygame-web/pygbag
+python3 -m pygbag --PYBUILD=3.11 --build .
