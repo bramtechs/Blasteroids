@@ -17,7 +17,7 @@ SPAWN_RANGE = main.SIZE[0] + 200
 
 
 class Asteroid(Polygon):
-    def __init__(self, pos, radius, samples, vel=(0, 0)):
+    def __init__(self, pos, radius=100, samples=30, vel=(0, 0)):
         super().__init__()
         self.pos = pos
         self.vel = vel
@@ -101,9 +101,7 @@ class Asteroid(Polygon):
         self.bar.update(delta, self.health, 0, self.max_health)
 
     def draw(self, screen, color):
-        for i in range(len(self.vertices) - 1):
-            pygame.draw.line(screen, color, self.vertices[i], self.vertices[i + 1])
-        pygame.draw.line(screen, color, self.vertices[0], self.vertices[len(self.vertices) - 1])
+        pygame.draw.polygon(screen, color, self.vertices, 1)
 
         self.bar.draw(screen, color, self.pos, (self.bounds[2], self.bounds[3]))
         # pygame.draw.rect(screen, (255, 0, 0), self.bounds, 1)
