@@ -37,6 +37,10 @@ def degrees_between_points(src, target):
     return math.degrees(math.atan2(delta_y, delta_x))
 
 
+def clamp(value, lower, upper):
+    return max(lower, min(value, upper))
+
+
 def scl_point(base: (int, int), scl: float) -> (int, int):
     return base[0] * scl, base[1] * scl
 
