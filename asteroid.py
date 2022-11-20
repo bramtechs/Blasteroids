@@ -107,6 +107,15 @@ class Asteroid(Polygon):
         # pygame.draw.rect(screen, (255, 0, 0), self.bounds, 1)
 
 
+class CustomAsteroid(Asteroid):
+    def __init__(self, vertices, radius=100, samples=30, vel=(0, 0)):
+        super().__init__((0, 0), radius, samples, vel)
+        self.vertices = vertices
+
+    def gen_vertices(self) -> []:
+        return self.vertices
+
+
 def overlaps(other: Polygon, exclude: Asteroid = None) -> bool:
     return overlaps_get(other, exclude) is not None
 

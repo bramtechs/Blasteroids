@@ -1,7 +1,6 @@
 import random
 
 import pygame.mouse
-
 import asteroid as ast
 import main
 import gui.labels
@@ -9,6 +8,7 @@ import gui.labels
 RED = (255, 0, 0)
 
 
+# unused
 class Editor:
     def __init__(self):
         self.title = gui.labels.Label((10, main.SIZE[1] / 2))
@@ -27,6 +27,16 @@ class Editor:
 
     def update(self, delta):
         self.timer += delta
+
+    def pressed_key(self, key):
+        if key == pygame.K_RETURN:
+            self.editor.place_vertex()
+        if key == pygame.K_SPACE:
+            self.editor.place_new()
+        if key == pygame.K_BACKSPACE:
+            self.editor.undo()
+        if key == pygame.K_p:
+            self.editor.export()
 
     def draw(self, screen, color):
         i = 0
@@ -48,8 +58,16 @@ class Editor:
         print("Placed point")
 
     def place_new(self):
-        self.points.append([])
-        print("Placed new asteroid")
+        # don't allow new asteroid if current asteroid has no vertices
+        if len(self.points[len(self.points) - 1]) > 0:
+            self.points.append([])
+            print("Placed new asteroid")
+
+    def export(self):
+        for point in self.points:
+            print(point)
+            ast.asteroids.append(ast.CustomAsteroid(point))
+        print("export")
 
     def undo(self):
         if len(self.points) > 0:
@@ -64,20 +82,25 @@ class Editor:
 
 class MainMenu:
     def __init__(self):
-        pos = (10, 10)
-        ast.asteroids.append(ast.Asteroid(pos))
-        self.editor = Editor()
+        self.title = gui.labels.Label((main.SIZE[0]/2-200, 30), font_size=72, segments=10)
+        self.editor = None
 
     def pressed_key(self, key):
-        if key == pygame.K_RETURN:
-            self.editor.place_vertex()
-        if key == pygame.K_SPACE:
-            self.editor.place_new()
-        if key == pygame.K_BACKSPACE:
-            self.editor.undo()
+        if key == pygame.K_F3:
+            if self.editor is None:
+                self.editor = Editor()
+            else:
+                self.editor = None
+
+        if self.editor is not None:
+            self.editor.pressed_key(key)
 
     def update(self, delta):
-        self.editor.update(delta)
+        if self.editor is not None:
+            self.editor.update(delta)
 
     def draw(self, screen, color):
-        self.editor.draw(screen, color)
+        self.title.render(screen, color, "Blasteroids!")
+
+        if self.editor is not None:
+            self.editor.draw(screen, color)

@@ -41,5 +41,13 @@ def scl_point(base: (int, int), scl: float) -> (int, int):
     return base[0] * scl, base[1] * scl
 
 
+def div_point(base: (int, int), div: float) -> (int, int):
+    return base[0] / div, base[1] / div
+
+
 def add_points(base: (int, int), adder: (int, int)) -> (int, int):
     return base[0] + adder[0], base[1] + adder[1]
+
+
+def sub_points(base: (int, int), adder: (int, int)) -> (int, int):
+    return base[0] - adder[0], base[1] - adder[1]
