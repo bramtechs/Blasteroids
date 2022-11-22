@@ -84,6 +84,11 @@ async def start():
         if menu is not None:
             menu.update(delta)
             menu.draw(screen, FG)
+            if menu.menuAction == 0:  # start game
+                menu = None
+            elif menu.menuAction == 2:  # quit game
+                keep_running = False
+                break
 
         pygame.display.update()
         clock.tick(FPS)
