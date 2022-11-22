@@ -108,7 +108,7 @@ class MainMenu:
 
         self.menuAction = -1
 
-    def pressed_key(self, key):
+    def pressed_key(self, key, game):
         if self.settings is None:
             if key == pygame.K_F3:
                 if self.editor is None:
@@ -127,6 +127,7 @@ class MainMenu:
             if key == pygame.K_RETURN:
                 self.menuAction = self.index
                 print("pressed menu item " + str(self.menuAction))
+                game.shake(0.1)
                 # open settings
                 if self.menuAction == 1:
                     self.settings = gui.settings_menu.SettingsMenu()

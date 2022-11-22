@@ -17,7 +17,7 @@ SPAWN_RANGE = main.SIZE[0] + 200
 
 
 class Asteroid(Polygon):
-    def __init__(self, pos, radius=100, samples=30, vel=(0, 0)):
+    def __init__(self, pos, radius=100, samples=30, vel=(0, 0), game=None):
         super().__init__()
         self.pos = pos
         self.vel = vel
@@ -27,6 +27,10 @@ class Asteroid(Polygon):
         self.seed = random.randint(0, 10000)
         self.rot_speed = random.randint(-30, 30)
         self.samples = samples
+
+        # ewww
+        self.game = game
+        assert (self.game is not None)
 
         self.rand_angles = []
         for i in range(self.samples):
@@ -57,7 +61,7 @@ class Asteroid(Polygon):
             vertices.append(result)
         return vertices
 
-    def update(self, delta):
+    def update(self, delta, game):
         super().update(delta)
         self.rot += delta * self.rot_speed
 
@@ -71,6 +75,7 @@ class Asteroid(Polygon):
                 player.score += 10
             else:
                 player.score += self.radius
+                self.game.shake(0.2, 3)
 
         if self.health <= 0:
             if self.radius / SPLIT_FACTOR > MIN_RADIUS:
@@ -78,10 +83,11 @@ class Asteroid(Polygon):
                 pos = self.vertices[random.randint(0, int(len(self.vertices) / 2))]
                 pos_alter = self.vertices[random.randint(int(len(self.vertices) / 2), int(len(self.vertices) - 1))]
                 samples = random.randint(5, 15)
-                asteroids.append(Asteroid(pos, self.radius / SPLIT_FACTOR, samples, self.vel))
-                asteroids.append(Asteroid(pos_alter, self.radius / SPLIT_FACTOR, samples, self.vel))
+                asteroids.append(Asteroid(pos, self.radius / SPLIT_FACTOR, samples, self.vel, game))
+                asteroids.append(Asteroid(pos_alter, self.radius / SPLIT_FACTOR, samples, self.vel, game))
             # ded
             asteroids.remove(self)
+            self.game.shake(0.1, 1)
             return
 
         # remove when out of bounds
@@ -150,16 +156,16 @@ def spawn(player: Player):
         math.cos(math.radians(deg_towards)) * power,
         math.sin(math.radians(deg_towards)) * power
     )
-    asteroids.append(Asteroid(pos, radius, samples, vel))
+    asteroids.append(Asteroid(pos, radius, samples, vel, player.game))
 
 
 def get_count() -> int:
     return len(asteroids)
 
 
-def update(delta):
+def update(delta, game):
     for ast in asteroids:
-        ast.update(delta)
+        ast.update(delta, game)
 
 
 def draw(screen, color):

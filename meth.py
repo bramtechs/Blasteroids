@@ -55,3 +55,11 @@ def add_points(base: (int, int), adder: (int, int)) -> (int, int):
 
 def sub_points(base: (int, int), adder: (int, int)) -> (int, int):
     return base[0] - adder[0], base[1] - adder[1]
+
+
+def brighten_color(col: (int, int, int), amount: int) -> (int, int, int):
+    return (
+        min(col[0] + amount, 255),
+        min(col[1] + amount, 255),
+        min(col[2] + amount, 255),
+    )

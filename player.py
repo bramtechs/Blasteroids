@@ -21,7 +21,7 @@ CRASH_PARTICLE_COUNT = 100
 
 
 class Player(Polygon):
-    def __init__(self, pos, size):
+    def __init__(self, pos, size, game):
         super().__init__()
         self.pos = pos
         self.size = size
@@ -31,6 +31,7 @@ class Player(Polygon):
         self.shoot_timer = 0
         self.alive = True
         self.score = 0
+        self.game = game
 
     def gen_vertices(self) -> []:
         vertices = []
@@ -117,6 +118,7 @@ class Player(Polygon):
 
     def died(self):
         self.alive = False
+        self.game.shake(0.5, 5)
         print("died")
 
     def draw(self, screen, color):
