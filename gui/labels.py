@@ -2,6 +2,7 @@ import time
 import pygame
 
 import main
+import math
 import meth
 from gui.bar import Bar
 from player import Player
@@ -22,9 +23,11 @@ class Label:
                 alpha = (self.segments - i) / self.segments * 200
             else:
                 alpha = i / self.segments * 200
+
             img = self.font.render(str(text), True, color)
             img.set_alpha(alpha)
-            pos = (self.pos[0] + self.offset[0] * i, self.pos[1] + self.offset[1] * i)
+            pos = (self.pos[0] + self.offset[0] * i,
+                   self.pos[1] + self.offset[1] * i)
             screen.blit(img, pos)
 
 
@@ -40,6 +43,17 @@ class GUI:
         self.xp_target = 300
         self.prev_xp_target = 0
 
+    def update(self, delta, timer):
+        radius = 1.2
+        self.score.offset = (
+            math.cos(timer) * radius,
+            math.sin(timer) * radius
+        )
+        self.xp_label.offset = (
+            math.cos(timer) * radius,
+            math.sin(timer) * radius
+        )
+
     def render(self, screen, delta, color):
         # check if score changed
         if self.prev_score < self.player.score:
@@ -51,6 +65,8 @@ class GUI:
         self.prev_score = self.player.score
 
         self.score.render(screen, color, int(self.player.score))
-        self.xpbar.update(delta, self.player.score, self.prev_xp_target, self.xp_target)
-        self.xpbar.draw(screen, color, (main.SIZE[0] / 2, main.SIZE[1] - 30), (main.SIZE[0], 30))
+        self.xpbar.update(delta, self.player.score,
+                          self.prev_xp_target, self.xp_target)
+        self.xpbar.draw(
+            screen, color, (main.SIZE[0] / 2, main.SIZE[1] - 30), (main.SIZE[0], 30))
         self.xp_label.render(screen, color, "Level " + str(self.xp_level))

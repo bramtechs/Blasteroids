@@ -12,6 +12,7 @@ import spawner
 import player
 import gui.labels
 import gui.main_menu
+import palettes
 
 SIZE = 900, 720
 FPS = 60
@@ -20,8 +21,9 @@ FPS = 60
 STATE_MENU = 0
 STATE_GAME = 1
 
-
 # OOP pain
+
+
 class Game:
 
     def __init__(self):
@@ -43,9 +45,6 @@ class Game:
 
         game_surf = pygame.surface.Surface(SIZE)
 
-        base_color_fg = (0, 255, 0)
-        base_color_bg = (7, 12, 4)
-
         # TODO write a system for this
         pressing_space = False
 
@@ -59,9 +58,14 @@ class Game:
 
         menu = gui.main_menu.MainMenu()
 
+        timer = 0
+
         keep_running = True
         while keep_running:
             delta = clock.get_time() / 1000.0
+
+            base_color_bg = palettes.active_color[0]
+            base_color_fg = palettes.active_color[1]
 
             for ev in pygame.event.get():
                 if ev.type == pygame.QUIT:
@@ -84,7 +88,6 @@ class Game:
                 offset_y = random.randint(-self.shake_power, self.shake_power)
 
                 color_fg = meth.brighten_color(base_color_fg, 150)
-                color_bg = meth.brighten_color(base_color_bg, 10)
                 self.shake_timer -= delta
             else:
                 self.shake_timer = 0
@@ -115,6 +118,7 @@ class Game:
             particles.draw(game_surf, color_fg)
 
             if menu is None:
+                gui_labels.update(delta, timer)
                 gui_labels.render(game_surf, delta, color_fg)
 
             if menu is not None:
@@ -128,6 +132,7 @@ class Game:
 
             screen.blit(game_surf, (offset_x, offset_y))
 
+            timer += delta
             pygame.display.update()
             clock.tick(FPS)
             await asyncio.sleep(0)

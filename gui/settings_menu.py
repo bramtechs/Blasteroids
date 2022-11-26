@@ -1,4 +1,5 @@
 import pygame
+import palettes
 
 import gui.selector
 import gui.labels
@@ -21,25 +22,20 @@ class SettingsMenu:
         self.options = []
         self.selectors = []
 
-        self.options.append(
-            gui.labels.Label((main.SIZE[0] / 2 - margin, y), font_size=28, segments=10, reversed=False))
-
         sel_offset = 400
-        self.selectors.append(
-            gui.selector.Selector((main.SIZE[0]-sel_offset, y), [
-                "Model 1",
-                "Model 2",
-                "Model 3",
-            ]))
-
-        y += h
         self.options.append(
             gui.labels.Label((main.SIZE[0] / 2 - margin, y), font_size=28, segments=10, reversed=False))
         self.selectors.append(gui.selector.Selector((main.SIZE[0]-sel_offset, y), [
             "Terminal",
+            "Monochrome",
             "Ocean",
             "Strawberry",
+            "Werewolf",
             "New Vegas",
+            "Miami",
+            "Hotpink",
+            "Toxic",
+            "LSD",
         ]))
 
         y += h
@@ -51,7 +47,7 @@ class SettingsMenu:
         ]))
 
     def update(self, delta, timer):
-        radius = 1.5
+        radius = 1.2
         self.title.offset = (
             math.cos(timer) * radius,
             math.sin(timer) * radius
@@ -72,6 +68,9 @@ class SettingsMenu:
         for sel in self.selectors:
             sel.update(delta, timer, radius)
 
+        # apply settings
+        palettes.set_color(self.selectors[0].index, timer)
+
     def pressed_key(self, key):
         if key == pygame.K_s or key == pygame.K_DOWN:
             self.index += 1
@@ -90,9 +89,8 @@ class SettingsMenu:
 
     def draw(self, screen, color):
         self.title.render(screen, color, "Settings")
-        self.options[0].render(screen, color, "Spaceship")
-        self.options[1].render(screen, color, "Colorscheme")
-        self.options[2].render(screen, color, "Hard mode")
+        self.options[0].render(screen, color, "Colorscheme")
+        self.options[1].render(screen, color, "Hard mode")
 
         # draw cursor
         pygame.draw.rect(screen, color,

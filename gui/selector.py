@@ -19,7 +19,7 @@ class Selector:
                                  segments=10, reversed=False)
             )
 
-    def update(self, delta, timer, radius=1.5):
+    def update(self, delta, timer, radius=1.2):
         for i in range(len(self.labels)):
             label = self.labels[i]
             if i == self.focused:
@@ -37,7 +37,7 @@ class Selector:
         if key == pygame.K_LEFT or key == pygame.K_a:
             self.index -= 1
         if key == pygame.K_RIGHT or key == pygame.K_d:
-            self.index -= 1
+            self.index += 1
 
         # wrap index around
         if self.index < 0:

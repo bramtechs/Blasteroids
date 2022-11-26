@@ -7,7 +7,6 @@ import main
 import gui.labels
 import meth
 import gui.settings_menu
-import gui.background
 
 RED = (255, 0, 0)
 
@@ -16,8 +15,6 @@ class MainMenu:
     def __init__(self):
         self.title = gui.labels.Label(
             (main.SIZE[0] / 2 - 270, 50), font_size=72, segments=10, reversed=False)
-
-        self.background = gui.background.Background()
 
         y = 300
         h = 80
@@ -42,12 +39,6 @@ class MainMenu:
 
     def pressed_key(self, key, game):
         if self.settings is None:
-            if key == pygame.K_F3:
-                if self.editor is None:
-                    self.editor = Editor()
-                else:
-                    self.editor = None
-
             if key == pygame.K_s or key == pygame.K_DOWN:
                 self.index += 1
             if key == pygame.K_w or key == pygame.K_UP:
@@ -69,7 +60,7 @@ class MainMenu:
             self.settings.pressed_key(key)
 
     def update(self, delta):
-        radius = 1.5
+        radius = 1.1
         self.title.offset = (
             math.cos(self.timer) * radius,
             math.sin(self.timer) * radius
@@ -91,12 +82,10 @@ class MainMenu:
         if self.settings is not None:
             self.settings.update(delta, self.timer)
 
-        self.background.update(delta)
-
         self.timer += delta
 
     def draw(self, screen, color):
-        #self.background.render(screen, color)
+
         self.title.render(screen, color, "Blasteroids!")
 
         if self.settings is None:
