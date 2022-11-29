@@ -30,7 +30,6 @@ class MainMenu:
         self.buttons.append(
             gui.labels.Label((main.SIZE[0] / 2 - margin, y), font_size=36, segments=10, reversed=False))
 
-        self.editor = None
         self.settings = None
         self.timer = 0
         self.index = 0
@@ -53,9 +52,6 @@ class MainMenu:
                 # open settings
                 if self.menuAction == 1:
                     self.settings = gui.settings_menu.SettingsMenu()
-
-            if self.editor is not None:
-                self.editor.pressed_key(key)
         else:
             self.settings.pressed_key(key)
 
@@ -77,10 +73,11 @@ class MainMenu:
                 -1
             )
 
-        if self.editor is not None:
-            self.editor.update(delta)
+        # update settings panel
         if self.settings is not None:
             self.settings.update(delta, self.timer)
+            if self.settings.should_quit:
+                self.settings = None;
 
         self.timer += delta
 
@@ -98,6 +95,3 @@ class MainMenu:
                              (self.buttons[self.index].pos[0] - 50, self.buttons[self.index].pos[1], 30, 30))
         else:
             self.settings.draw(screen, color)
-
-        if self.editor is not None:
-            self.editor.draw(screen, color)

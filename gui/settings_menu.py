@@ -1,6 +1,8 @@
 import pygame
 import palettes
 
+import spawner
+
 import gui.selector
 import gui.labels
 
@@ -18,6 +20,7 @@ class SettingsMenu:
         h = 80
         margin = 280
 
+        self.should_quit = False
         self.index = 0
         self.options = []
         self.selectors = []
@@ -46,6 +49,11 @@ class SettingsMenu:
             "OFF"
         ]))
 
+        y += h
+
+        self.options.append(
+            gui.labels.Label((main.SIZE[0] / 2 - margin, y), font_size=28, segments=10, reversed=False))
+
     def update(self, delta, timer):
         radius = 1.2
         self.title.offset = (
@@ -70,6 +78,7 @@ class SettingsMenu:
 
         # apply settings
         palettes.set_color(self.selectors[0].index, timer)
+        spawner.set_hard(self.selectors[1].index == 0)
 
     def pressed_key(self, key):
         if key == pygame.K_s or key == pygame.K_DOWN:
@@ -81,16 +90,24 @@ class SettingsMenu:
 
         for i in range(len(self.selectors)):
             self.selectors[i].focused = False
-        self.selectors[self.index].focused = True
+
+        if self.index < len(self.selectors):
+            self.selectors[self.index].focused = True
 
         # pass key input to selectors
         for sel in self.selectors:
             sel.pressed_key(key)
 
+        # check for back button pressed
+        if key == pygame.K_RETURN and self.index == len(self.selectors):
+            print("left settings")
+            self.should_quit = True
+
     def draw(self, screen, color):
         self.title.render(screen, color, "Settings")
         self.options[0].render(screen, color, "Colorscheme")
         self.options[1].render(screen, color, "Hard mode")
+        self.options[2].render(screen, color, "Back")
 
         # draw cursor
         pygame.draw.rect(screen, color,

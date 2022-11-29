@@ -36,23 +36,31 @@ class Player(Polygon):
     def gen_vertices(self) -> []:
         vertices = []
         # 0 top left
-        x = math.cos(math.radians(self.rot + 180 + PL_ANGLE)) * self.size + self.pos[0]
-        y = math.sin(math.radians(self.rot + 180 + PL_ANGLE)) * self.size + self.pos[1]
+        x = math.cos(math.radians(self.rot + 180 + PL_ANGLE)) * \
+            self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 + PL_ANGLE)) * \
+            self.size + self.pos[1]
         vertices.append((x, y))
 
         # 1 bot left
-        x = math.cos(math.radians(self.rot + 180 - PL_ANGLE)) * self.size + self.pos[0]
-        y = math.sin(math.radians(self.rot + 180 - PL_ANGLE)) * self.size + self.pos[1]
+        x = math.cos(math.radians(self.rot + 180 - PL_ANGLE)) * \
+            self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 - PL_ANGLE)) * \
+            self.size + self.pos[1]
         vertices.append((x, y))
 
         # 2 top left inner
-        x = math.cos(math.radians(self.rot + 180 + PL_ANGLE / 2)) * self.size + self.pos[0]
-        y = math.sin(math.radians(self.rot + 180 + PL_ANGLE / 2)) * self.size + self.pos[1]
+        x = math.cos(math.radians(self.rot + 180 + PL_ANGLE / 2)
+                     ) * self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 + PL_ANGLE / 2)
+                     ) * self.size + self.pos[1]
         vertices.append((x, y))
 
         # 3 bot left inner
-        x = math.cos(math.radians(self.rot + 180 - PL_ANGLE / 2)) * self.size + self.pos[0]
-        y = math.sin(math.radians(self.rot + 180 - PL_ANGLE / 2)) * self.size + self.pos[1]
+        x = math.cos(math.radians(self.rot + 180 - PL_ANGLE / 2)
+                     ) * self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 - PL_ANGLE / 2)
+                     ) * self.size + self.pos[1]
         vertices.append((x, y))
 
         # 4 right
@@ -108,8 +116,10 @@ class Player(Polygon):
 
         # particles on tail
         rng_angle = random.randint(-10, 10)
-        x = math.cos(math.radians(self.rot + 180 + rng_angle)) * self.size + self.pos[0]
-        y = math.sin(math.radians(self.rot + 180 + rng_angle)) * self.size + self.pos[1]
+        x = math.cos(math.radians(self.rot + 180 + rng_angle)) * \
+            self.size + self.pos[0]
+        y = math.sin(math.radians(self.rot + 180 + rng_angle)) * \
+            self.size + self.pos[1]
         cone = (
             (self.rot + 180 - PL_ANGLE),
             (self.rot + 180 + PL_ANGLE)

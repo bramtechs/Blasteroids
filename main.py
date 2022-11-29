@@ -120,8 +120,7 @@ class Game:
             if menu is None:
                 gui_labels.update(delta, timer)
                 gui_labels.render(game_surf, delta, color_fg)
-
-            if menu is not None:
+            else:
                 menu.update(delta)
                 menu.draw(game_surf, color_fg)
                 if menu.menuAction == 0:  # start game

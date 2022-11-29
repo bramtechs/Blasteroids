@@ -36,8 +36,10 @@ class Selector:
             return
         if key == pygame.K_LEFT or key == pygame.K_a:
             self.index -= 1
+            print("left")
         if key == pygame.K_RIGHT or key == pygame.K_d:
             self.index += 1
+            print("right")
 
         # wrap index around
         if self.index < 0:
