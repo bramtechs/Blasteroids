@@ -13,7 +13,7 @@ SPLIT_FACTOR = 2
 asteroids = []
 
 OOB = main.SIZE[0] + 400
-SPAWN_RANGE = main.SIZE[0] + 200
+SPAWN_RANGE = main.SIZE[0] + 70
 
 
 class Asteroid(Polygon):
@@ -85,9 +85,14 @@ class Asteroid(Polygon):
                 samples = random.randint(5, 15)
                 asteroids.append(Asteroid(pos, self.radius / SPLIT_FACTOR, samples, self.vel, game))
                 asteroids.append(Asteroid(pos_alter, self.radius / SPLIT_FACTOR, samples, self.vel, game))
+
             # ded
             asteroids.remove(self)
-            self.game.shake(0.1, 1)
+
+            dist = math.dist(self.pos, meth.scl_point(main.SIZE, 0.5))
+            if dist < main.SIZE[0]: # ugly way to prevent screen shake offscreen
+                self.game.shake(0.1, 1)
+
             return
 
         # remove when out of bounds

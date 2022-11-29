@@ -45,8 +45,8 @@ class SettingsMenu:
         self.options.append(
             gui.labels.Label((main.SIZE[0] / 2 - margin, y), font_size=28, segments=10, reversed=False))
         self.selectors.append(gui.selector.Selector((main.SIZE[0]-sel_offset, y), [
-            "ON",
-            "OFF"
+            "OFF",
+            "ON"
         ]))
 
         y += h
@@ -78,7 +78,7 @@ class SettingsMenu:
 
         # apply settings
         palettes.set_color(self.selectors[0].index, timer)
-        spawner.set_hard(self.selectors[1].index == 0)
+        spawner.set_hard(self.selectors[1].index == 1)
 
     def pressed_key(self, key):
         if key == pygame.K_s or key == pygame.K_DOWN:
