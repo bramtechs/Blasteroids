@@ -1,12 +1,15 @@
-import bullet
-import main
-import meth
 from gui.bar import Bar
 from player import Player
 from poly import Polygon
+
+import bullet
+import main
+import meth
+
 import random
 import math
 import pygame
+import audio
 
 MIN_RADIUS = 20
 SPLIT_FACTOR = 2
@@ -40,11 +43,12 @@ class Asteroid(Polygon):
         self.max_health = self.health
 
         self.vertices = self.gen_vertices()
-        self.bounds = (self.pos[0] - self.radius, self.pos[1] - self.radius, self.radius * 2, self.radius * 2)
+        self.bounds = (self.pos[0] - self.radius, self.pos[1] -
+                       self.radius, self.radius * 2, self.radius * 2)
 
         self.bar = Bar()
 
-    def gen_vertices(self) -> []:
+    def gen_vertices(self):
         inner_radius = 10
         vertices = []
         angle_per_seg = 360 / self.samples
@@ -54,8 +58,10 @@ class Asteroid(Polygon):
             y = self.radius * math.sin(math.radians(angle))
 
             inner_angle = self.rand_angles[i]
-            inner_x = math.cos(math.radians(inner_angle + self.rot)) * inner_radius
-            inner_y = math.sin(math.radians(inner_angle + self.rot)) * inner_radius
+            inner_x = math.cos(math.radians(
+                inner_angle + self.rot)) * inner_radius
+            inner_y = math.sin(math.radians(
+                inner_angle + self.rot)) * inner_radius
 
             result = (self.pos[0] + x + inner_x, self.pos[1] + y + inner_y)
             vertices.append(result)
@@ -68,30 +74,40 @@ class Asteroid(Polygon):
         global asteroids
 
         # catch incoming bullets
+        was_killed = False
         player = bullet.catch(self)
         if player is not None:
             self.health -= 10
             if self.health > 0:
                 player.score += 10
+                audio.ins.hit.play()
             else:
                 player.score += self.radius
                 self.game.shake(0.2, 3)
+                audio.ins.explosion.play()
+                was_killed = True
 
         if self.health <= 0:
             if self.radius / SPLIT_FACTOR > MIN_RADIUS:
                 # spawn two new ones
-                pos = self.vertices[random.randint(0, int(len(self.vertices) / 2))]
-                pos_alter = self.vertices[random.randint(int(len(self.vertices) / 2), int(len(self.vertices) - 1))]
+                pos = self.vertices[random.randint(
+                    0, int(len(self.vertices) / 2))]
+                pos_alter = self.vertices[random.randint(
+                    int(len(self.vertices) / 2), int(len(self.vertices) - 1))]
                 samples = random.randint(5, 15)
-                asteroids.append(Asteroid(pos, self.radius / SPLIT_FACTOR, samples, self.vel, game))
-                asteroids.append(Asteroid(pos_alter, self.radius / SPLIT_FACTOR, samples, self.vel, game))
+                asteroids.append(Asteroid(pos, self.radius /
+                                 SPLIT_FACTOR, samples, self.vel, game))
+                asteroids.append(
+                    Asteroid(pos_alter, self.radius / SPLIT_FACTOR, samples, self.vel, game))
 
             # ded
             asteroids.remove(self)
 
             dist = math.dist(self.pos, meth.scl_point(main.SIZE, 0.5))
-            if dist < main.SIZE[0]: # ugly way to prevent screen shake offscreen
+            if dist < main.SIZE[0]:  # ugly way to prevent screen shake offscreen
                 self.game.shake(0.1, 1)
+                if not was_killed:
+                    audio.ins.loexplosion.play()
 
             return
 
@@ -114,7 +130,8 @@ class Asteroid(Polygon):
     def draw(self, screen, color):
         pygame.draw.polygon(screen, color, self.vertices, 1)
 
-        self.bar.draw(screen, color, self.pos, (self.bounds[2], self.bounds[3]))
+        self.bar.draw(screen, color, self.pos,
+                      (self.bounds[2], self.bounds[3]))
         # pygame.draw.rect(screen, (255, 0, 0), self.bounds, 1)
 
 
@@ -123,7 +140,7 @@ class CustomAsteroid(Asteroid):
         super().__init__((0, 0), radius, samples, vel)
         self.vertices = vertices
 
-    def gen_vertices(self) -> []:
+    def gen_vertices(self):
         return self.vertices
 
 

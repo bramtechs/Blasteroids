@@ -1,5 +1,6 @@
 import math
 import random
+import audio
 
 import pygame.mouse
 import asteroid as ast
@@ -40,10 +41,15 @@ class MainMenu:
         if self.settings is None:
             if key == pygame.K_s or key == pygame.K_DOWN:
                 self.index += 1
+                audio.ins.cursor.play()
             if key == pygame.K_w or key == pygame.K_UP:
                 self.index -= 1
+                audio.ins.cursor.play()
 
-            self.index = meth.clamp(self.index, 0, 2)
+            if self.index > 2:
+                self.index = 0
+            elif self.index < 0:
+                self.index = 2
 
             # clickly clicky on those menu-items
             if key == pygame.K_RETURN:
@@ -52,6 +58,7 @@ class MainMenu:
                 # open settings
                 if self.menuAction == 1:
                     self.settings = gui.settings_menu.SettingsMenu()
+                audio.ins.select.play()
         else:
             self.settings.pressed_key(key)
 
@@ -77,7 +84,7 @@ class MainMenu:
         if self.settings is not None:
             self.settings.update(delta, self.timer)
             if self.settings.should_quit:
-                self.settings = None;
+                self.settings = None
 
         self.timer += delta
 

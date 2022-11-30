@@ -2,6 +2,7 @@ import pygame
 import gui.labels
 
 import math
+import audio
 
 
 class Selector:
@@ -36,9 +37,11 @@ class Selector:
             return
         if key == pygame.K_LEFT or key == pygame.K_a:
             self.index -= 1
+            audio.ins.cursor.play()
             print("left")
         if key == pygame.K_RIGHT or key == pygame.K_d:
             self.index += 1
+            audio.ins.cursor.play()
             print("right")
 
         # wrap index around

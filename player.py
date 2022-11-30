@@ -11,6 +11,7 @@ import meth
 import bullet
 import asteroid
 import pygame
+import audio
 
 PL_ANGLE = 30
 SHOOT_INTERVAL = 0.2
@@ -32,8 +33,9 @@ class Player(Polygon):
         self.alive = True
         self.score = 0
         self.game = game
+        self.level = 0
 
-    def gen_vertices(self) -> []:
+    def gen_vertices(self):
         vertices = []
         # 0 top left
         x = math.cos(math.radians(self.rot + 180 + PL_ANGLE)) * \
@@ -129,6 +131,7 @@ class Player(Polygon):
     def died(self):
         self.alive = False
         self.game.shake(0.5, 5)
+        audio.ins.death.play()
         print("died")
 
     def draw(self, screen, color):

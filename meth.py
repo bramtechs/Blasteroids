@@ -41,23 +41,23 @@ def clamp(value, lower, upper):
     return max(lower, min(value, upper))
 
 
-def scl_point(base: (int, int), scl: float) -> (int, int):
+def scl_point(base, scl: float):
     return base[0] * scl, base[1] * scl
 
 
-def div_point(base: (int, int), div: float) -> (int, int):
+def div_point(base, div: float):
     return base[0] / div, base[1] / div
 
 
-def add_points(base: (int, int), adder: (int, int)) -> (int, int):
+def add_points(base, adder):
     return base[0] + adder[0], base[1] + adder[1]
 
 
-def sub_points(base: (int, int), adder: (int, int)) -> (int, int):
+def sub_points(base, adder):
     return base[0] - adder[0], base[1] - adder[1]
 
 
-def brighten_color(col: (int, int, int), amount: int) -> (int, int, int):
+def brighten_color(col, amount: int):
     return (
         min(col[0] + amount, 255),
         min(col[1] + amount, 255),

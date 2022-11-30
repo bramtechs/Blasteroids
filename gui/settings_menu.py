@@ -2,6 +2,7 @@ import pygame
 import palettes
 
 import spawner
+import audio
 
 import gui.selector
 import gui.labels
@@ -83,10 +84,15 @@ class SettingsMenu:
     def pressed_key(self, key):
         if key == pygame.K_s or key == pygame.K_DOWN:
             self.index += 1
+            audio.ins.cursor.play()
         if key == pygame.K_w or key == pygame.K_UP:
             self.index -= 1
+            audio.ins.cursor.play()
 
-        self.index = meth.clamp(self.index, 0, 2)
+        if self.index > 2:
+            self.index = 0
+        elif self.index < 0:
+            self.index = 2
 
         for i in range(len(self.selectors)):
             self.selectors[i].focused = False
@@ -102,6 +108,7 @@ class SettingsMenu:
         if key == pygame.K_RETURN and self.index == len(self.selectors):
             print("left settings")
             self.should_quit = True
+            audio.ins.select.play()
 
     def draw(self, screen, color):
         self.title.render(screen, color, "Settings")

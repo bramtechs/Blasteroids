@@ -34,7 +34,7 @@ class Bullet(Polygon):
         pygame.draw.line(screen, color, self.pos, self.prev_pos)
         pass
 
-    def gen_vertices(self) -> []:
+    def gen_vertices(self):
         return [self.pos, self.prev_pos]
 
 

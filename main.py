@@ -12,7 +12,9 @@ import spawner
 import player
 import gui.labels
 import gui.main_menu
+import gui.ingame
 import palettes
+import audio
 
 SIZE = 900, 720
 FPS = 60
@@ -22,6 +24,8 @@ STATE_MENU = 0
 STATE_GAME = 1
 
 # OOP pain
+
+# TODO fix settings panel from resetting options
 
 
 class Game:
@@ -37,9 +41,8 @@ class Game:
         print("shake")
 
     async def start(self):
-        # pygame opengl setup
-
         pygame.init()
+        audio.Audio()
         screen = pygame.display.set_mode(SIZE)
         pygame.display.set_caption("pygame asteroids")
 
@@ -52,7 +55,7 @@ class Game:
         spawner.init()
         particles.init()
 
-        gui_labels = gui.labels.GUI(pl)
+        gui_labels = gui.ingame.GUI(pl)
 
         clock = pygame.time.Clock()
 
