@@ -1,6 +1,7 @@
 import random
 
 from pygame import *
+from gui.leaderboard import Leaderboard
 
 import particles
 from poly import Polygon
@@ -34,6 +35,7 @@ class Player(Polygon):
         self.score = 0
         self.game = game
         self.level = 0
+        self.leaderboard = None
 
     def gen_vertices(self):
         vertices = []
@@ -74,6 +76,7 @@ class Player(Polygon):
 
     def update(self, delta):
         if not self.alive:
+            self.leaderboard.update(delta)
             return
 
         mouse_pos = pygame.mouse.get_pos()
@@ -131,11 +134,15 @@ class Player(Polygon):
     def died(self):
         self.alive = False
         self.game.shake(0.5, 5)
+
+        self.leaderboard = Leaderboard()
+
         audio.ins.death.play()
         print("died")
 
     def draw(self, screen, color):
         if not self.alive:
+            self.leaderboard.draw(screen, color)
             return
 
         pygame.draw.line(screen, color, self.vertices[0], self.vertices[4])
