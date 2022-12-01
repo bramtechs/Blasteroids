@@ -2,3 +2,5 @@
 build
 **/__pycache__
 **/**~
+
+gui/secret.py
