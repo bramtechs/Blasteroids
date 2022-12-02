@@ -71,7 +71,7 @@ def init():
         particles.append(create_empty())
 
 
-def emit(pos, power, radius, life_time, amount=1, cone: (int, int) = (0, 360)):
+def emit(pos, power, radius, life_time, amount=1, cone = (0, 360)):
     done = 0
     for part in particles:
         if not part.is_active:

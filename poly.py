@@ -11,7 +11,7 @@ class Polygon:
     def draw(self, screen, color):
         pass
 
-    def gen_vertices(self) -> []:
+    def gen_vertices(self):
         return []
 
         # https://www.youtube.com/watch?v=7Ik2vowGcU0
@@ -39,7 +39,8 @@ class Polygon:
                 max_r1 = sys.float_info.min
 
                 for p in range(len(poly1.vertices)):
-                    q = poly1.vertices[p][0] * axis_proj[0] + poly1.vertices[p][1] * axis_proj[1]
+                    q = poly1.vertices[p][0] * axis_proj[0] + \
+                        poly1.vertices[p][1] * axis_proj[1]
                     min_r1 = min(min_r1, q)
                     max_r1 = max(max_r1, q)
 
@@ -48,7 +49,8 @@ class Polygon:
                 max_r2 = sys.float_info.min
 
                 for p in range(len(poly2.vertices)):
-                    q = poly2.vertices[p][0] * axis_proj[0] + poly2.vertices[p][1] * axis_proj[1]
+                    q = poly2.vertices[p][0] * axis_proj[0] + \
+                        poly2.vertices[p][1] * axis_proj[1]
                     min_r2 = min(min_r2, q)
                     max_r2 = max(max_r2, q)
 

@@ -25,8 +25,6 @@ STATE_GAME = 1
 
 # OOP pain
 
-# TODO fix settings panel from resetting options
-
 
 class Game:
 
