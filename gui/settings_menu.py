@@ -55,6 +55,10 @@ class SettingsMenu:
         self.options.append(
             gui.labels.Label((main.SIZE[0] / 2 - margin, y), font_size=28, segments=10, reversed=False))
 
+        # fetch settings
+        self.selectors[0].index = palettes.active_color_index
+        self.selectors[1].index = int(spawner.is_hard())
+
     def update(self, delta, timer):
         radius = 1.2
         self.title.offset = (

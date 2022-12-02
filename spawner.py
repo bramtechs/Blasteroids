@@ -11,6 +11,10 @@ def init():
     timer = INTERVAL
 
 
+def is_hard():
+    return hardness > 0.8
+
+
 def set_hard(hard: bool):
     global hardness
 

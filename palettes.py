@@ -14,14 +14,12 @@ LSD = [(255, 255, 255), (0, 0, 0)]
 colors = [TERMINAL, MONOCHROME, OCEAN,
           STRAWBERRY, WEREWOLF, NEW_VEGAS, MIAMI,  HOTPINK, TOXIC, LSD]
 active_color = (TERMINAL[0], TERMINAL[1])
+active_color_index = 0
 
 
-def set_color(index: int, timer: float):
-    global active_color
-    active_color = colors[index]
-
+def update(delta, timer):
     lsd_id = 9
-    if index == lsd_id:
+    if active_color_index == lsd_id:
         colors[lsd_id][0] = (
             abs(math.sin(timer)*255),
             abs(math.cos(timer)*255),
@@ -32,3 +30,9 @@ def set_color(index: int, timer: float):
             255-abs(math.cos(timer))*255,
             255-abs(math.sin(timer*2))*255,
         )
+
+
+def set_color(index: int, timer: float):
+    global active_color, active_color_index
+    active_color = colors[index]
+    active_color_index = index
