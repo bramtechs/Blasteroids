@@ -132,6 +132,8 @@ class Game:
 
             screen.blit(game_surf, (offset_x, offset_y))
 
+            palettes.update(delta, timer)
+
             timer += delta
             pygame.display.update()
             clock.tick(FPS)
