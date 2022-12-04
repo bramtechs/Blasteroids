@@ -31,7 +31,7 @@ class GUI:
     def render(self, screen, delta, color):
         # check if score changed
         if self.prev_score < self.player.score:
-            print("score changed")
+            #print("score changed")
             if self.player.score > self.xp_target:
                 self.prev_xp_target = self.xp_target
                 self.xp_target *= 2
@@ -45,4 +45,5 @@ class GUI:
                           self.prev_xp_target, self.xp_target)
         self.xpbar.draw(
             screen, color, (main.SIZE[0] / 2, main.SIZE[1] - 30), (main.SIZE[0], 30))
-        self.xp_label.render(screen, color, "Level " + str(self.player.level))
+        self.xp_label.render(screen, color, "Level " +
+                             str(self.player.level+1))

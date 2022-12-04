@@ -38,11 +38,11 @@ class Selector:
         if key == pygame.K_LEFT or key == pygame.K_a:
             self.index -= 1
             audio.ins.cursor.play()
-            print("left")
+           # print("left")
         if key == pygame.K_RIGHT or key == pygame.K_d:
             self.index += 1
             audio.ins.cursor.play()
-            print("right")
+            #print("right")
 
         # wrap index around
         if self.index < 0:

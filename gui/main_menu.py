@@ -54,7 +54,7 @@ class MainMenu:
             # clickly clicky on those menu-items
             if key == pygame.K_RETURN:
                 self.menuAction = self.index
-                print("pressed menu item " + str(self.menuAction))
+                #print("pressed menu item " + str(self.menuAction))
                 # open settings
                 if self.menuAction == 1:
                     self.settings = gui.settings_menu.SettingsMenu()

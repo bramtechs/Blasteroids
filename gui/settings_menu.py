@@ -51,13 +51,21 @@ class SettingsMenu:
         ]))
 
         y += h
+        self.options.append(
+            gui.labels.Label((main.SIZE[0] / 2 - margin, y), font_size=28, segments=10, reversed=False))
+        self.selectors.append(gui.selector.Selector((main.SIZE[0]-sel_offset, y), [
+            "OFF",
+            "ON"
+        ]))
 
+        y += h
         self.options.append(
             gui.labels.Label((main.SIZE[0] / 2 - margin, y), font_size=28, segments=10, reversed=False))
 
         # fetch settings
         self.selectors[0].index = palettes.active_color_index
         self.selectors[1].index = int(spawner.is_hard())
+        self.selectors[2].index = int(audio.is_playing())
 
     def update(self, delta, timer):
         radius = 1.2
@@ -84,6 +92,7 @@ class SettingsMenu:
         # apply settings
         palettes.set_color(self.selectors[0].index, timer)
         spawner.set_hard(self.selectors[1].index == 1)
+        audio.mute(self.selectors[2].index == 0)
 
     def pressed_key(self, key):
         if key == pygame.K_s or key == pygame.K_DOWN:
@@ -93,10 +102,10 @@ class SettingsMenu:
             self.index -= 1
             audio.ins.cursor.play()
 
-        if self.index > 2:
+        if self.index > 3:
             self.index = 0
         elif self.index < 0:
-            self.index = 2
+            self.index = 3
 
         for i in range(len(self.selectors)):
             self.selectors[i].focused = False
@@ -110,7 +119,7 @@ class SettingsMenu:
 
         # check for back button pressed
         if key == pygame.K_RETURN and self.index == len(self.selectors):
-            print("left settings")
+            #print("left settings")
             self.should_quit = True
             audio.ins.select.play()
 
@@ -118,7 +127,8 @@ class SettingsMenu:
         self.title.render(screen, color, "Settings")
         self.options[0].render(screen, color, "Colorscheme")
         self.options[1].render(screen, color, "Hard mode")
-        self.options[2].render(screen, color, "Back")
+        self.options[2].render(screen, color, "SFX")
+        self.options[3].render(screen, color, "Back")
 
         # draw cursor
         pygame.draw.rect(screen, color,

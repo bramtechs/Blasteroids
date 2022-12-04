@@ -36,7 +36,7 @@ class Game:
     def shake(self, duration: float, power=3):
         self.shake_timer += duration
         self.shake_power = power
-        print("shake")
+        #print("shake")
 
     async def start(self):
         pygame.init()

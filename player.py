@@ -138,7 +138,7 @@ class Player(Polygon):
         self.leaderboard = Leaderboard()
 
         audio.ins.death.play()
-        print("died")
+        #print("died")
 
     def draw(self, screen, color):
         if not self.alive:
